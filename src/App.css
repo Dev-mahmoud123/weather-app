@@ -1,0 +1,58 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.container-content {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  flex-direction: column;
+}
+
+.card {
+  width: 100%;
+  background: #717dee;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.city-time {
+  display: flex;
+  justify-content: start;
+  align-items: end;
+  margin-right: 10px;
+  gap: 20px;
+}
+.degree-description {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.description {
+  color: #d6d6d6;
+}
+.temp {
+  text-align: right;
+}
+
+.degree {
+  text-align: right;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.min-max-degree {
+  display: flex;
+  gap: 30px;
+  margin-top: 10px;
+}
