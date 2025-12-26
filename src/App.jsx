@@ -1,11 +1,14 @@
-import { Button, Container } from "@mui/material";
+import { Button, CircularProgress, Container } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import CloudIcon from "@mui/icons-material/Cloud";
 import "./App.css";
 import { useEffect, useState } from "react";
 import useCurrentLocation from "./useCurrentLocation";
-import fetchData from "./fetchData";
+// import fetchData from "./fetchData";
 import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchWeather } from "./features/weather/weatherApiSlice";
+// import fetchData from "./fetchData";
 
 function App() {
   const API_KEY = import.meta.env.VITE_APP_API_KEY;
@@ -16,10 +19,15 @@ function App() {
     loading: locationLoading,
   } = useCurrentLocation();
   const { t, i18n } = useTranslation();
-  const [weather, setWeather] = useState(null);
-  const [weatherError, setWeatherError] = useState(null);
-  const [weatherLoader, setWeatherLoader] = useState(false);
+  // const [weather, setWeather] = useState(null);
+  // const [weatherError, setWeatherError] = useState(null);
+  // const [weatherLoader, setWeatherLoader] = useState(false);
   const [locale, setLocale] = useState("ar");
+  //  redux toolkit
+  const weather = useSelector((state) => state.weather.weather);
+  const loading = useSelector((state) => state.weather.isLoading);
+  const error = useSelector((state) => state.weather.error);
+  const dispatch = useDispatch();
 
   // Date and Time Formatter
   const now = new Date();
@@ -30,25 +38,44 @@ function App() {
   });
 
   useEffect(() => {
-    const loaderWeather = async () => {
-      if (!coords || !API_KEY) return;
-      setWeatherLoader(true);
+    if (!coords || !API_KEY) {
+      return;
+    } else {
       try {
-        const data = await fetchData({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          api_key: API_KEY,
-          lang: i18n.language,
-        });
-        setWeather(data);
+        dispatch(
+          fetchWeather({
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            api_key: API_KEY,
+            lang: i18n.language,
+          })
+        );
       } catch (error) {
-        setWeatherError(error?.message || String(error));
-      } finally {
-        setWeatherLoader(false);
+        console .log("Error fetching weather data:", error);
       }
-    };
-    loaderWeather();
-  }, [coords, API_KEY, i18n.language]);
+    }
+  }, [coords, API_KEY, i18n.language, dispatch]);
+
+  // useEffect(() => {
+  //   const loaderWeather = async () => {
+  //     if (!coords || !API_KEY) return;
+  //     setWeatherLoader(true);
+  //     try {
+  //       const data = await fetchData({
+  //         latitude: coords.latitude,
+  //         longitude: coords.longitude,
+  //         api_key: API_KEY,
+  //         lang: i18n.language,
+  //       });
+  //       setWeather(data);
+  //     } catch (error) {
+  //       setWeatherError(error?.message || String(error));
+  //     } finally {
+  //       setWeatherLoader(false);
+  //     }
+  //   };
+  //   loaderWeather();
+  // }, [coords, API_KEY, i18n.language]);
 
   if (locationLoading) return <div>{t("getting your location")}</div>;
   if (locationError)
@@ -70,9 +97,9 @@ function App() {
     <div className="app">
       <Container maxWidth="sm">
         <div className="container-content">
-          {weatherLoader && <p>{t("getting weather data")}</p>}
-          {weatherError && <p>{t("failed to get weather data")}</p>}
-          {weather && (
+          {loading && <CircularProgress />}
+          {error && <p>{t("failed to get weather data")}</p>}
+          {weather && weather.main &&(
             <div className="card">
               <div className="city-time" dir={locale === "en" ? "ltr" : "rlt"}>
                 <Typography variant="h6">{formatter.format(now)}</Typography>
